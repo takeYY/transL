@@ -53,7 +53,6 @@ def translate(input_text):
     # '#dl_translator > div.lmt__sides_container > div.lmt__side_container.lmt__side_container--target > div.lmt__textarea_container > div.lmt__translations_as_text > p > button.lmt__translations_as_text__text_btn'
     output_text = driver.find_element_by_css_selector(
         Output_selector).get_attribute('textContent')
-    print(output_text)
 
     # スクショ（確認用）
     # driver.save_screenshot('{0:%Y_%m_%d__%H_%M_%S}'.format(dt.now()) + '.png')
@@ -71,9 +70,17 @@ if __name__ == '__main__':
     for index, body_list in enumerate(chapter_list):
         # 章題を追加
         result += f"{title_list[index]}\n"
+        # 章題を出力
+        print('*'*100)
+        print(
+            f'({str(index+1).zfill(len(str(len(chapter_list))))}/{len(chapter_list)}): {title_list[index]}')
+        print('*'*100)
         for idx, body in enumerate(body_list):
             # 1文ごとに翻訳
             output_text = translate(body)
+            # 翻訳結果出力
+            print(
+                f'({str(idx+1).zfill(len(str(len(body_list))))}/{len(body_list)}): {output_text}')
             # 本文の結果を追加
             result += f"{idx+1}. {body}\n\t- =={output_text}==\n"
         result += "\n"

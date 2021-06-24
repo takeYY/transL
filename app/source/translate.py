@@ -49,10 +49,9 @@ def translate(input_text):
 
     sleep(5)
 
-    Output_selector = '#dl_translator > div.lmt__text > div.lmt__sides_container > div.lmt__side_container.lmt__side_container--target > div.lmt__textarea_container.lmt__textarea_container_no_shadow > div.lmt__translations_as_text > p.lmt__translations_as_text__item.lmt__translations_as_text__main_translation > button.lmt__translations_as_text__text_btn'
-    # '#dl_translator > div.lmt__sides_container > div.lmt__side_container.lmt__side_container--target > div.lmt__textarea_container > div.lmt__translations_as_text > p > button.lmt__translations_as_text__text_btn'
+    output_selector = '#dl_translator > div.lmt__text > div.lmt__sides_container > div.lmt__side_container.lmt__side_container--target > div.lmt__textarea_container > div.lmt__translations_as_text > p > button.lmt__translations_as_text__text_btn'
     output_text = driver.find_element_by_css_selector(
-        Output_selector).get_attribute('textContent')
+        output_selector).get_attribute('textContent')
 
     # スクショ（確認用）
     # driver.save_screenshot('{0:%Y_%m_%d__%H_%M_%S}'.format(dt.now()) + '.png')

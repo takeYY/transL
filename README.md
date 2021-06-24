@@ -1,4 +1,4 @@
-# selenium_in_docker
+# transL
 
 selenium を docker 上で動かす  
 英語論文を自動翻訳するプログラム

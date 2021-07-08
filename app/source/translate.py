@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 import os
+import re
 from time import sleep
 
 from selenium import webdriver
@@ -61,6 +62,25 @@ def translate(input_text):
     return output_text
 
 
+def formula2eqs(body):
+    # 変換する辞書（key: 変換後の文字列, value: 変換前の文字列）
+    formula_dict = {}
+    # markdown記法の数式パターン
+    formula_pattern = '\$.*?\$'
+    formula_body = re.findall(formula_pattern, body)
+    # 変換する文字列を辞書に登録
+    for i, fb in enumerate(formula_body):
+        formula_dict[f'<<EQS{i}>>'] = repr(fb)
+        body = re.sub(formula_pattern, f'<<EQS{i}>>', body, 1)
+    return body, formula_dict
+
+
+def eqs2formula(body, formula_dict):
+    for key, value in formula_dict.items():
+        body = body.replace(key, eval(value))
+    return body
+
+
 if __name__ == '__main__':
     # タイトルと章ごとの本文リストを取得
     title_list, chapter_list = get_title_chapter_list()
@@ -75,8 +95,16 @@ if __name__ == '__main__':
             f'({str(index+1).zfill(len(str(len(chapter_list))))}/{len(chapter_list)}): {title_list[index]}')
         print('*'*100)
         for idx, body in enumerate(body_list):
-            # 1文ごとに翻訳
-            output_text = translate(body)
+            # 数式コードを<<EQS{N}>>へ変換
+            new_body, formula_dict = formula2eqs(body)
+            # 1文ごとに翻訳（結果がなければ最大5回繰り返して翻訳にかける）
+            loop_num = 0
+            output_text = ''
+            while(not output_text and loop_num < 5):
+                output_text = translate(new_body)
+                loop_num += 1
+            # 数式文字列を元に戻す
+            output_text = eqs2formula(output_text, formula_dict)
             # 翻訳結果出力
             print(
                 f'({str(idx+1).zfill(len(str(len(body_list))))}/{len(body_list)}): {output_text}')

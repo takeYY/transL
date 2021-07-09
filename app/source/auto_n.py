@@ -1,3 +1,15 @@
+def escape_special_words(body, swords):
+    for sw in swords:
+        body = body.replace(sw, f'『{sw}』')
+    return body
+
+
+def back2special_words(body, swords):
+    for sw in swords:
+        body = body.replace(f'『{sw}』', sw)
+    return body
+
+
 def auto_n():
     # テキストの読み込みパス
     path_r = 'text/english.txt'
@@ -22,16 +34,17 @@ def auto_n():
     # 改行をスペースでjoin
     body = ' '.join(body_list)
     body_list = body.split('='*50)
+    # エスケープさせる特殊な表現
+    special_words = ['et al.', 'Eqn.', 'Eq.', 'Eqs.',
+                     'e.g.', 'i.g.', 'Fig.', 'Tab.']
     for index, bd in enumerate(body_list):
         result += f"{title_list[index]}\n\n"
-        bd = bd.replace('et al.', '『et al』')
-        bd = bd.replace('Eqn. ', '『Eqn』')
-        bd = bd.replace('Eq. ', '『Eq』')
+        # 特殊な表現をエスケープ
+        bd = escape_special_words(bd, special_words)
         s_list = bd.split('. ')
         for idx, string in enumerate(s_list):
-            string = string.replace('『et al』', 'et al.')
-            string = string.replace('『Eqn』', 'Eqn. ')
-            string = string.replace('『Eq』', 'Eq. ')
+            # エスケープされた特殊な表現を元に戻す
+            string = back2special_words(string, special_words)
             while (string.startswith(' ')):
                 string = string[1:]
             string = string.replace('- ', '')

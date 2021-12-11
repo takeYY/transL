@@ -9,7 +9,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 def get_title_chapter_list():
     # テキストの読み込みパス
-    path_r = 'text/result.txt'
+    path_r = 'text/format.txt'
     # txtファイルの読み込み
     s_l = []
     with open(path_r) as f:
@@ -86,31 +86,44 @@ if __name__ == '__main__':
     title_list, chapter_list = get_title_chapter_list()
     # 最終出力データ
     result = ''
-    for index, body_list in enumerate(chapter_list):
-        # 章題を追加
-        result += f"{title_list[index]}\n"
-        # 章題を出力
-        print('*'*100)
-        print(
-            f'({str(index+1).zfill(len(str(len(chapter_list))))}/{len(chapter_list)}): {title_list[index]}')
-        print('*'*100)
-        for idx, body in enumerate(body_list):
-            # 数式コードを<<EQS{N}>>へ変換
-            new_body, formula_dict = formula2eqs(body)
-            # 1文ごとに翻訳（結果がなければ最大5回繰り返して翻訳にかける）
-            loop_num = 0
-            output_text = ''
-            while(not output_text and loop_num < 5):
-                output_text = translate(new_body)
-                loop_num += 1
-            # 数式文字列を元に戻す
-            output_text = eqs2formula(output_text, formula_dict)
-            # 翻訳結果出力
+    try:
+        for index, body_list in enumerate(chapter_list):
+            # 章題を追加
+            result += f"{title_list[index]}\n"
+            # 章題を出力
+            print('*'*100)
             print(
-                f'({str(idx+1).zfill(len(str(len(body_list))))}/{len(body_list)}): {output_text}')
-            # 本文の結果を追加
-            result += f"{idx+1}. {body}\n\t- =={output_text}==\n"
-        result += "\n"
+                f'({str(index+1).zfill(len(str(len(chapter_list))))}/{len(chapter_list)}): {title_list[index]}')
+            print('*'*100)
+            for idx, body in enumerate(body_list):
+                # 数式コードを<<EQS{N}>>へ変換
+                new_body, formula_dict = formula2eqs(body)
+                # 1文ごとに翻訳（結果がなければ最大10回繰り返して翻訳にかける）
+                loop_num = 0
+                output_text = ''
+                while(not output_text and loop_num < 5):
+                    try:
+                        output_text = translate(new_body)
+                    except:
+                        print(f'翻訳失敗！（残りtry回数：{5-loop_num+1}）')
+                    loop_num += 1
+                    # 5回tryして失敗した場合、例外を発生させ、途中結果を出力
+                    if 5 <= loop_num:
+                        raise Exception
+                # 数式文字列を元に戻す
+                output_text = eqs2formula(output_text, formula_dict)
+                # 翻訳結果出力
+                print(
+                    f'({str(idx+1).zfill(len(str(len(body_list))))}/{len(body_list)}): {output_text}')
+                # 本文の結果を追加
+                result += f"{idx+1}. {body}\n\t- =={output_text}==\n"
+            result += "\n"
+    except:
+        # ファイルへの書き込み
+        path_w = 'text/translate_not_completed.txt'
+        with open(path_w, mode='w') as f:
+            f.write(result)
+        print('translation is not completed... Try again.')
     # ファイルへの書き込み
     path_w = 'text/translate.txt'
     with open(path_w, mode='w') as f:

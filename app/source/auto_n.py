@@ -4,7 +4,7 @@ def escape_special_words(body, swords):
     return body
 
 
-def back2special_words(body, swords):
+def transform2special_words(body, swords):
     for sw in swords:
         body = body.replace(f'『{sw}』', sw)
     return body
@@ -14,7 +14,7 @@ def auto_n():
     # テキストの読み込みパス
     path_r = 'text/english.txt'
     # テキストの書き込みパス
-    path_w = 'text/result.txt'
+    path_w = 'text/format.txt'
     s_l = []
     body = ''
     title_list = []
@@ -44,7 +44,7 @@ def auto_n():
         s_list = bd.split('. ')
         for idx, string in enumerate(s_list):
             # エスケープされた特殊な表現を元に戻す
-            string = back2special_words(string, special_words)
+            string = transform2special_words(string, special_words)
             while (string.startswith(' ')):
                 string = string[1:]
             string = string.replace('- ', '')
